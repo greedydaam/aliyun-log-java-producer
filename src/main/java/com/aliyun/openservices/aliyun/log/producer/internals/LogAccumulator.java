@@ -167,11 +167,19 @@ public final class LogAccumulator {
     long nowMs = System.currentTimeMillis();
     ExpiredBatches expiredBatches = new ExpiredBatches();
     long remainingMs = producerConfig.getLingerMs();
-    for (Map.Entry<GroupKey, ProducerBatchHolder> entry : batches.entrySet()) {
+    Iterator<Map.Entry<GroupKey, ProducerBatchHolder>> iterator = batches.entrySet().iterator();
+    while(iterator.hasNext()){
+      Map.Entry<GroupKey, ProducerBatchHolder> entry = iterator.next();
       ProducerBatchHolder holder = entry.getValue();
       synchronized (holder) {
         if (holder.producerBatch == null) {
-          continue;
+          //增加三次超时处理之后的删除逻辑，防止对象一直缓存
+          if(holder.delayClear<=3) {
+            holder.delayClear++;
+            continue;
+          }else{
+            iterator.remove();
+          }
         }
         long curRemainingMs = holder.producerBatch.remainingMs(nowMs, producerConfig.getLingerMs());
         if (curRemainingMs <= 0) {
@@ -258,7 +266,7 @@ public final class LogAccumulator {
   }
 
   private static final class ProducerBatchHolder {
-
+    int delayClear=0;
     ProducerBatch producerBatch;
 
     void transferProducerBatch(

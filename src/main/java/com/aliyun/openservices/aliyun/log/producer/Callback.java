@@ -7,12 +7,12 @@ package com.aliyun.openservices.aliyun.log.producer;
  */
 public interface Callback {
 
-  /**
-   * A callback method the user can implement to provide asynchronous handling of request
-   * completion. This method will be called when the log(s) sent to the server has been
-   * acknowledged.
-   *
-   * @param result The result of a {@link LogProducer#send} operation.
-   */
-  void onCompletion(Result result);
+    /**
+     * A callback method the user can implement to provide asynchronous handling of request
+     * completion. This method will be called when the log(s) sent to the server has been
+     * acknowledged.
+     *
+     * @param result The result of a {@link LogProducer#send} operation.
+     */
+    void onCompletion(Result result);
 }
